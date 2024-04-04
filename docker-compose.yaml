@@ -1,0 +1,30 @@
+---
+version: "3"
+
+services:
+
+  scylla-client:
+    container_name: scylla-client
+    image: scylladb/scylla:5.2.16
+    restart: always
+    ports:
+      - 9042:9042
+      - 10000:10000
+    command: --seeds=scylla-client --memory 750M --overprovisioned 1 --api-address 0.0.0.0 --reactor-backend=epoll
+    networks:
+      - scylla_network
+
+  scylla-replicas:
+    deploy:
+      replicas: 2
+    image: scylladb/scylla:5.2.16
+    restart: always
+    depends_on:
+      - scylla-client
+    command: --seeds=scylla-client --memory 750M --overprovisioned 1 --api-address 0.0.0.0 --reactor-backend=epoll
+    networks:
+      - scylla_network
+
+
+networks:
+  scylla_network:
